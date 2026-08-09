@@ -1,5 +1,19 @@
 android_app {
     name: "Updater",
+
+    // AOT compilation is disabled to fit the system partition.
+    //
+    // Measured: SYSTEM content is 1326.6 MB without Updater, which is exactly
+    // July's known-good size. The APK adds 5.4 MB and its .odex another 7.7 MB.
+    // With the odex the total is 1339.7 MB — the size that FAILED image
+    // generation at a 1269 MB max. Without it, 1332.0 MB, which signed fine.
+    //
+    // The cost is JIT on first launch, which is irrelevant for an app that
+    // polls for updates on a timer. The alternative is system_ext placement,
+    // which also means relocating its permission XMLs.
+    dex_preopt: {
+        enabled: false,
+    },
     srcs: ["src/**/*.java"],
     resource_dirs: ["res"],
     static_libs: [
